@@ -1,5 +1,4 @@
 /******************************************************************************\
-* $Id: lead.sas 4903 2019-10-10 21:05:47Z stsztu $
 *
 * Name: lead.sas
 *
@@ -29,8 +28,8 @@
 *Calculate one lead ahead for two variables and rename them
 %lead(data=sashelp.cars, out=cars_lead, var=horsepower msrp, rename=horsepower_lead msrp_lead);
 
-*Calculate one lead ahead with a by-group
-%lead(data=sashelp.bmimen(obs=50), var=bmi, out=bmi_lead, by=age);
+*Calculate two leads ahead with a by-group
+%lead(data=sashelp.bmimen(obs=50), var=bmi, out=bmi_lead, by=age, lead=2);
 
 * History: 15AUG2019 Stu | v0.1 - Initial coding
 		   10OCT2019 Stu | v0.2 - Greatly improved performance by converting from
@@ -39,19 +38,21 @@
 *								  SGF: 3699-2019
 \******************************************************************************/
 
-%macro lead(data=
-		  , out=
-		  , var=
-		  , rename=
-		  , by=
-		  , lead=1
-		  , setmissing=MISSING
-		   );
+%macro lead(data=     /*Input dataset. Supports dataset options.*/
+		  , out=      /*Output dataset. Supports dataset options.*/
+		  , var=      /*Variables to lead. Space-separated.*/
+		  , rename=   /*Optional. New names for variables in order of variables specified in var*/
+		  , by=       /*Optional. Add by group processing for leads.*/
+		  , lead=1    /*Optional. Set lead amount. Default: 1*/
+		  , setmissing=MISSING /*Optional. Set the value of missing leads. Default: MISSING.*/
+		   ) / minoperator mindelimiter=' ';
 
 	%local i;
 	%let setmissing = %upcase(&setmissing.);
 
-	%let var_count = %sysfunc(countw(&var,,QS));;
+	%let var_count  = %sysfunc(countw(&var,,QS));
+    %let last_byvar = %scan(&by., -1, %str( ), Q);
+
 	%let lead_varlist = ;
 	%let lead_varlistc = ;
 
@@ -123,10 +124,13 @@
 		/* Set last value to missing for by-groups or a user-specific value */
 		%if(&by. NE) %then %do;
 
-			if(last.%scan(&by., -1, %str( ), Q) ) then do;
+            /* Check the future value of the by group */
+            _leadby_ = getvarn(_lead_dsid_, varnum(_lead_dsid_, "&last_byvar"));
+
+            if(_leadby_ NE &last_byvar.) then do;
 
 				/* Set missing values based on user input */
-				%if(%upcase(&setmissing. = MISSING) OR &setmissing. = .) %then %do;
+				%if(%upcase(&setmissing. = MISSING) OR &setmissing. = . OR %cmpres(&setmissing.) IN ('' "")) %then %do;
 					call missing(&lead_varlistc.);
 				%end;
 					%else %do;
@@ -137,6 +141,6 @@
 			end;
 		%end;
 
-		drop _lead_rc_ _lead_dsid_;
+		drop _lead_rc_ _lead_dsid_ _leadby_;
 	run;
 %mend;
