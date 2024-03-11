@@ -83,7 +83,6 @@
     /* Convert var list to comma-separated and quoted-comma-separated list */
     %let varlistcq = %unquote(%str(%")%qsysfunc(tranwrd(%qsysfunc(compbl(%upcase(&var))),%str( ),%str(",")))%str(%"));
 
-    %put *** &lib ** &dsn *** &varlistcq;
     /* Identify if each lead var is numeric or character */
     proc sql noprint;
         select type
