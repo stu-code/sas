@@ -36,7 +36,8 @@
 *						   		  PROC EXPAND to a data step. Thank you, Andrew Gannon!
 *								  https://www.sas.com/content/dam/SAS/support/en/sas-global-forum-proceedings/2019/3699-2019.pdf
 *								  SGF: 3699-2019
-*          11MAR2023 Stu | v0.3 - Fixed a bug where by-groups would not calculate correctly for characters
+*          11MAR2023 Stu | v0.3 - Fixed a bug where by-groups would not calculate correctly for characters.
+*                               - Added support for character leads
 \******************************************************************************/
 
 %macro lead(data=     /*Input dataset. Supports dataset options.*/
@@ -78,6 +79,20 @@
 		%let n_rename = %sysfunc(min(&n_rename_total., &n_var.));
 	%end;
 		%else %let n_rename = 0;
+    
+    /* Convert var list to comma-separated and quoted-comma-separated list */
+    %let varlistcq = %unquote(%str(%")%qsysfunc(tranwrd(%qsysfunc(compbl(%upcase(&var))),%str( ),%str(",")))%str(%"));
+
+    /* Identify if each lead var is numeric or character */
+    proc sql noprint;
+        select type
+        into :var_types separated by ' '
+        from dictionary.columns
+        where     libname = "&lib"
+              AND memname = "&dsn"
+              AND upcase(name) IN (&varlistcq)
+        ;
+    quit;
 
     /* Identify if the byvar is num or char */
     %if(&by. NE) %then %do;
@@ -107,6 +122,7 @@
 
 		%do i = 1 %to &var_count.;
 			%let orig_var = %scan(&var., &i., %str( ), Q);
+            %let var_type = %scan(&var_types., &i., %str( ), Q);
 
 			/* If the user specified to rename variables, do so here */
 			%if(&rename. NE AND &i. LE &n_rename.) %then %do;
@@ -134,26 +150,31 @@
 
 					%let lead_var = "lead&lead._%substr(&orig_varname., 1, &substrlen.)"n;
 
-					%let lead_varlist = &lead_varlist. &lead_var.;
+					%let lead_varlist  = &lead_varlist. &lead_var.;
 
-					/* Create comma-separated list of lead vars */
-					%if(&i. = 1) %then %let lead_varlistc = &lead_var.;
+                     /* Create comma-separated list of lead vars */
+					 %if(&i. = 1) %then %let lead_varlistc = &lead_var.;
 						%else %let lead_varlistc = &lead_varlistc., &lead_var.;
 				%end;
 
-			&lead_var. = getvarn(_lead_dsid_, varnum(_lead_dsid_, "&orig_var."));
-
+            /* Calculate leads for numbers or characters */
+            %if(&var_type. = num) %then %do;
+			    &lead_var. = getvarn(_lead_dsid_, varnum(_lead_dsid_, "&orig_var."));
+            %end;
+                %else %do;
+			        &lead_var. = getvarc(_lead_dsid_, varnum(_lead_dsid_, "&orig_var."));
+                %end;
 		%end;
 
 		/* Set last value to missing for by-groups or a user-specific value */
 		%if(&by. NE) %then %do;
 
             /* Check the future value of the by group */
-            %if(&byvar_type = char) %then %do;
-                _leadby_ = getvarc(_lead_dsid_, varnum(_lead_dsid_, "&last_byvar"));
+            %if(&byvar_type = num) %then %do;
+                _leadby_ = getvarn(_lead_dsid_, varnum(_lead_dsid_, "&last_byvar"));
             %end;
                 %else %do;
-                    _leadby_ = getvarn(_lead_dsid_, varnum(_lead_dsid_, "&last_byvar"));
+                    _leadby_ = getvarc(_lead_dsid_, varnum(_lead_dsid_, "&last_byvar"));
                 %end;
  
             if(_leadby_ NE &last_byvar.) then do;
