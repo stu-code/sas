@@ -61,10 +61,10 @@
     /* Separate out lib and dsn and account for options */
     %if(%qscan(%superq(data), 2, ., Q) =) %then %do;
         %let lib = WORK;
-        %let dsn = %scan(%qupcase(%superq(data)), 1, %str(%(), Q));
+        %let dsn = %scan(%qupcase(%superq(data)), 1, %str(%(), Q);
     %end;
         %else %do;
-            %let lib = %qupcase(%qscan(%superq(data), 1, ., Q));
+            %let lib = %upcase(%qscan(%superq(data), 1, ., Q));
             %let dsn = %scan(%qupcase(%qscan(%superq(data), 2, ., Q)), 1, %str(%(), Q);
         %end;
 
@@ -83,6 +83,7 @@
     /* Convert var list to comma-separated and quoted-comma-separated list */
     %let varlistcq = %unquote(%str(%")%qsysfunc(tranwrd(%qsysfunc(compbl(%upcase(&var))),%str( ),%str(",")))%str(%"));
 
+    %put *** &lib ** &dsn *** &varlistcq;
     /* Identify if each lead var is numeric or character */
     proc sql noprint;
         select type
