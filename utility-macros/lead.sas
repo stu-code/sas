@@ -168,8 +168,10 @@
 						%end;
 					%end;
 			end;
+
+            drop _leadby_;
 		%end;
 
-		drop _lead_rc_ _lead_dsid_ _leadby_;
+		drop _lead_rc_ _lead_dsid_;
 	run;
 %mend;
