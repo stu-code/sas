@@ -36,6 +36,7 @@
 *						   		  PROC EXPAND to a data step. Thank you, Andrew Gannon!
 *								  https://www.sas.com/content/dam/SAS/support/en/sas-global-forum-proceedings/2019/3699-2019.pdf
 *								  SGF: 3699-2019
+*          11MAR2023 Stu | v0.3 - Fixed a bug where by-groups would not calculate correctly for characters
 \******************************************************************************/
 
 %macro lead(data=     /*Input dataset. Supports dataset options.*/
@@ -53,13 +54,23 @@
 	%let var_count  = %sysfunc(countw(&var,,QS));
     %let last_byvar = %scan(&by., -1, %str( ), Q);
 
-	%let lead_varlist = ;
+	%let lead_varlist  = ;
 	%let lead_varlistc = ;
+
+    /* Separate out lib and dsn and account for options */
+    %if(%qscan(%superq(data), 2, ., Q) =) %then %do;
+        %let lib = WORK;
+        %let dsn = %scan(%qupcase(%superq(data)), 1, %str(%(), Q));
+    %end;
+        %else %do;
+            %let lib = %qupcase(%qscan(%superq(data), 1, ., Q));
+            %let dsn = %scan(%qupcase(%qscan(%superq(data), 2, ., Q)), 1, %str(%(), Q);
+        %end;
 
 	%if(&rename. NE ) %then %do;
 		
 		%let n_rename_total = %sysfunc(countw(&rename., %str( ), Q));
-		%let n_var	  = %sysfunc(countw(&var., %str( ), Q));
+		%let n_var = %sysfunc(countw(&var., %str( ), Q));
 
 		%if(&n_rename_total. NE &n_var.) %then
 			%put Warning: Total number of output variable names differs from the variables specified.;
@@ -67,6 +78,19 @@
 		%let n_rename = %sysfunc(min(&n_rename_total., &n_var.));
 	%end;
 		%else %let n_rename = 0;
+
+    /* Identify if the byvar is num or char */
+    %if(&by. NE) %then %do;
+        proc sql noprint;
+            select type
+            into :byvar_type
+            from dictionary.columns
+            where     libname = "&lib"
+                  AND memname = "&dsn"
+                  AND upcase(name) = upcase("&last_byvar")
+            ;
+        quit;
+    %end;
 
 	data &out.;
 		set &data.;
@@ -125,8 +149,13 @@
 		%if(&by. NE) %then %do;
 
             /* Check the future value of the by group */
-            _leadby_ = getvarn(_lead_dsid_, varnum(_lead_dsid_, "&last_byvar"));
-
+            %if(&byvar_type = char) %then %do;
+                _leadby_ = getvarc(_lead_dsid_, varnum(_lead_dsid_, "&last_byvar"));
+            %end;
+                %else %do;
+                    _leadby_ = getvarn(_lead_dsid_, varnum(_lead_dsid_, "&last_byvar"));
+                %end;
+ 
             if(_leadby_ NE &last_byvar.) then do;
 
 				/* Set missing values based on user input */
