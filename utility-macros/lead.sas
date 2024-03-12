@@ -12,7 +12,7 @@
 *            by         | Optional by-groups separated by spaces
 *            lead       | Leads to calculate. 
 *                         Default: 1
-*            setmissing | Applies only to by-groups. Sets missing lead values to a specific value by the user. 
+*            setmissing | Sets missing lead values to a specific value by the user. 
 *                         Default: MISSING
 *
 * Dependencies/Assumptions: N/A
