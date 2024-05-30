@@ -79,7 +79,7 @@ proc tsmodel data   = casuser.a10
         dcl object loglin_model(tsm);
         dcl object winters_model(tsm);
 
-        dcl object outfor(tsmfor ('modelname', 'yes') );
+        dcl object outfor(tsmfor('modelname', 'yes') );
 
         /* ARIMA spec */
         rc = arima_spec.open();
