@@ -18,8 +18,8 @@
 *
 * Usage: Experimental for performing cross-validation with TSMODEL. 
 *
-* History: 29MAY2024 stu | v0.1 - Initial test
-*          30MAY2024 stu | v0.2 - Significantly improved performance
+* History: 29MAY2024 Stu | v0.1 - Initial test
+*          30MAY2024 Stu | v0.2 - Significantly improved performance
 \******************************************************************************/
 
 /******* User parameters *******/
