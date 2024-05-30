@@ -9,9 +9,9 @@
 *
 * Author: Stu Sztukowski
 *
-* Parameters: folder    | Folder location where a10.csv lives
-*             file      | File name of a10.csv
-*             lead      | Forecast length
+* Parameters: folder    | Folder location where a10.csv lives in the Viya File Service
+*             file      | File name of a10.csv in the Viya File Service
+*             lead      | Forecast length (months)
 *             min_train | Minimum number of training periods
 *
 * Dependencies/Assumptions: Viya 4 with Visual Forecasting is installed
