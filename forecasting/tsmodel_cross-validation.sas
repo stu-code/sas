@@ -11,8 +11,8 @@
 *
 * Parameters: folder    | Folder location where a10.csv lives
 *             file      | File name of a10.csv
+*             lead      | Forecast length
 *             min_train | Minimum number of training periods
-*             max_lead  | Maximum forecast length
 *
 * Dependencies/Assumptions: Viya 4 with Visual Forecasting is installed
 *
@@ -23,8 +23,10 @@
 \******************************************************************************/
 
 /******* User parameters *******/
-%let folder = ...;
-%let file   = a10.csv;
+%let folder    = ...;
+%let file      = a10.csv;
+%let lead      = 12;
+%let min_train = 60;
 
 /******* Program Start *******/
 cas;
@@ -132,12 +134,11 @@ proc tsmodel data   = casuser.a10
         rc = winters_model.initialize(winters_spec);
             rc = winters_model.setY(sales);
                    
-        /* Max lead periods and minimum number of training obs */
+        /* Total forecasted periods */
         lead = &lead;
-        min_train = &min_train;
         
         /* Forecast one step ahead until we reach the end of the series*/
-        do step = min_train to _LENGTH_;
+        do step = &min_train to _LENGTH_;
 
             /* Add +lead to account for back=
                Add +1 to account for horizon */
