@@ -18,16 +18,13 @@
 *
 * Usage: Experimental for performing cross-validation with TSMODEL. 
 *
-* History: 05MAY2024 stsztu | v0.1 - Initial test
-*
+* History: 29MAY2024 stsztu | v0.1 - Initial test
+*          30MAY2024 stsztu | v0.2 - Significantly improved performance
 \******************************************************************************/
 
-
 /******* User parameters *******/
-%let folder    = ...;
-%let file      = a10.csv;
-%let min_train = 60;
-%let max_lead  = 12;
+%let folder = ...;
+%let file   = a10.csv;
 
 /******* Program Start *******/
 cas;
@@ -53,12 +50,14 @@ data casuser.a10;
 
     trend+1;
 
+    call symputx('_LENGTH_', _N_);
+
     drop rownames i time;
 run;
 
 proc tsmodel data   = casuser.a10
              outobj = (outfor=casuser.outfor);
- 
+
     id date interval=month;
     
     var sales season: trend;
@@ -97,7 +96,8 @@ proc tsmodel data   = casuser.a10
         rc = arima_spec.close();
     
         /* Log-linear spec */
-        rc = loglin_spec.open();           
+        rc = loglin_spec.open();
+            
             rc = loglin_spec.setTransform('log');          
             rc = loglin_spec.addTF('trend');
 
@@ -131,55 +131,67 @@ proc tsmodel data   = casuser.a10
         /* Define Multiplicative Winters ESM */
         rc = winters_model.initialize(winters_spec);
             rc = winters_model.setY(sales);
+                   
+        /* Max lead periods and minimum number of training obs */
+        lead = &lead;
+        min_train = &min_train;
         
-        /* Forecast 1-max_lead periods out and collect error for each */
-        do lead = 1 to &max_lead;
-            do h = &min_train to _LENGTH_;
+        /* Forecast one step ahead until we reach the end of the series*/
+        do step = min_train to _LENGTH_;
 
-                /* Keeps from duplicating forecasts once the horizon exceeds the length */
-                if(h+lead+1 > _LENGTH_) then leave;
+            /* Add +lead to account for back=
+               Add +1 to account for horizon */
+            horizon = date[step+lead+1];
 
-                /* Add +lead to account for back=
-                   Add +1 to account for horizon */
-                horizon = date[h+lead+1];
+            /* Prevent lead from going too far (i.e. "collision detection" with the end of time series "wall")
+               If this is not done then forecasts will repeat at the end of the series */
+            if(step+lead > _LENGTH_) then lead = lead-1;
 
-                rc = arima_model.setOption('back', lead, 'lead', lead, 'horizon', horizon);
-                rc = loglin_model.setOption('back', lead, 'lead', lead, 'horizon', horizon);
-                rc = winters_model.setOption('back', lead, 'lead', lead, 'horizon', horizon);
+            rc = arima_model.setOption('back', lead, 'lead', lead, 'horizon', horizon);
+            rc = loglin_model.setOption('back', lead, 'lead', lead, 'horizon', horizon);
+            rc = winters_model.setOption('back', lead, 'lead', lead, 'horizon', horizon);
     
-                rc = arima_model.run();
-                rc = loglin_model.run(); 
-                rc = winters_model.run();
+            rc = arima_model.run();
+            rc = loglin_model.run(); 
+            rc = winters_model.run();
             
-                /* Each model name consists of the horizon and number of training obs.
-                   For example: ARIMA_1_60 means the ARIMA model with 1 lead and 60 training obs.
-                   This makes it easy to grab the max date for each forecast later */
-                rc = outfor.setOption('modelname', cats('ARIMA_', lead, '_', h) );
-                rc = outfor.collect(arima_model, 'forecast');
+            rc = outfor.setOption('modelname', cats('ARIMA_', step) );
+            rc = outfor.collect(arima_model, 'forecast');
+        
+            rc = outfor.setOption('modelname', cats('LOGLIN_', step) );
+            rc = outfor.collect(loglin_model, 'forecast');
     
-                rc = outfor.setOption('modelname', cats('LOGLIN_', lead, '_', h) );
-                rc = outfor.collect(loglin_model, 'forecast');
-    
-                rc = outfor.setOption('modelname', cats('Winters_', lead, '_', h) );
-                rc = outfor.collect(winters_model, 'forecast');
-            end;
+            rc = outfor.setOption('modelname', cats('Winters_', step) );
+            rc = outfor.collect(winters_model, 'forecast');
         end;
 
     endsubmit;
+run;
+
+/* Add horizon */
+data casuser.outfor2;
+    set casuser.outfor;
+    by _MODEL_ date;
+
+    if(first._MODEL_) then horizon = 0;
+    horizon+1;
+
+    step  = input(scan(_MODEL_, -1, '_'), 8.);
+    model = scan(_MODEL_, 1, '_');
 run;
 
 /* Grab the max date for each forecast and calculate MAE for each horizon */
 proc sql;
     create table plot as
         select scan(_MODEL_, 1, '_') as Model
-             , input(scan(_MODEL_, 2, '_'), 8.) as Horizon
+             , Horizon
              , mean(abs(error)) as MAE
-        from (select _MODEL_, error
-              from casuser.outfor
-              group by _MODEL_
+        from (select _MODEL_, horizon, error
+              from casuser.outfor2
+              group by _MODEL_, horizon
               having date = max(date)
              )
-        group by calculated model, calculated horizon
+        group by calculated model, horizon
     ;
 quit;
 
