@@ -4,7 +4,7 @@
 *
 * Purpose: Performs cross-validation on the A10 R anti-diabetic sales dataset
 *          using TSMODEL. The goal is to try and recreate Udo Sglavo's HPF cross-validation work 
-*          from 2011 using TSMODEL in Viya. For more information, see his blog post:
+*          from 2011 using TSMODEL in Viya. For more information, see Udo's blog post:
 *          https://blogs.sas.com/content/forecasting/2011/09/02/guest-blogger-udo-sglavo-on-cross-validation-using-sas-forecast-server-part-1-of-2/
 *
 * Author: Stu Sztukowski
@@ -12,9 +12,10 @@
 * Parameters: folder    | Folder location where a10.csv lives in the Viya File Service
 *             file      | File name of a10.csv in the Viya File Service
 *             lead      | Forecast length (months)
-*             min_train | Minimum number of training periods
+*             min_train | Minimum number of training periods (months)
 *
-* Dependencies/Assumptions: Viya 4 with Visual Forecasting is installed
+* Dependencies/Assumptions: - Viya 4 with Visual Forecasting is installed
+*                           - a10.csv is somewhere in the Viya File Service
 *
 * Usage: Experimental for performing cross-validation with TSMODEL. 
 *
