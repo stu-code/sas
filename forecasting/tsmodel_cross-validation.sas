@@ -53,8 +53,6 @@ data casuser.a10;
 
     trend+1;
 
-    call symputx('_LENGTH_', _N_);
-
     drop rownames i time;
 run;
 
