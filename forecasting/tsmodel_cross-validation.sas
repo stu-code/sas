@@ -97,8 +97,7 @@ proc tsmodel data   = casuser.a10
         rc = arima_spec.close();
     
         /* Log-linear spec */
-        rc = loglin_spec.open();
-            
+        rc = loglin_spec.open();            
             rc = loglin_spec.setTransform('log');          
             rc = loglin_spec.addTF('trend');
 
@@ -119,7 +118,6 @@ proc tsmodel data   = casuser.a10
         /* Define Log-linear model */
         rc = loglin_model.initialize(loglin_spec);
             rc = loglin_model.setY(sales);
-
             rc = loglin_model.addX(trend);
 
             %macro add_season;
