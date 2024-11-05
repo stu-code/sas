@@ -96,7 +96,7 @@ quit;
 ) / minoperator mindelimiter=' ';
 
     %global &outmacvar.;
-    %local outattr;
+    %local outname;
 
     /* Remove case-sensitivity */
     %let data     = %upcase(&data.);
@@ -106,7 +106,7 @@ quit;
     %let format   = %upcase(&format.);
     %let informat = %upcase(&informat.);
     %let label    = %upcase(&label.);
-    %let outattr  = _outattr_%sysfunc(round(%sysfunc(datetime())));
+    %let outname  = _outname_%sysfunc(round(%sysfunc(datetime())));
 
     /****** Dependent Macros ******/
 
@@ -172,7 +172,7 @@ quit;
                             drop=&drop.
                         %end;
                         )
-            out=&outattr.
+            out=&outname.
             name=name;
             var _ALL_;
         run;
@@ -277,7 +277,7 @@ quit;
 
         /* Filter to only the list of variables to keep or drop */
         %if(%isnull(keep) = 0 OR %isnull(drop) = 0) %then %do;
-            AND name IN(select name from &outattr.)
+            AND name IN(select name from &outname.)
         %end;
     ;
     quit;
@@ -286,9 +286,28 @@ quit;
     %if(%isnull(keep) = 0 OR %isnull(drop) = 0) %then %do;
 
         proc datasets lib=work nolist nowarn;
-            delete &outattr.;
+            delete &outname.;
         quit;
 
     %end;
 
 %mend getattribs;
+
+%getattribs(data=sashelp.cars, keep=make);
+
+data merge;
+    set lib.data;
+    
+    if(_N_ = 1) then do;
+        &attribs;
+        dcl hash h(dataset: 'sashelp.cars');
+            h.defineKey('model');
+            h.defineData('make');
+        h.defineDone();
+        call missing(model);
+    end;
+
+    rc = h.Find();
+
+    drop rc;
+run;
