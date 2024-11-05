@@ -5,7 +5,7 @@
 *
 *
 * Author: Stu Sztukowski
-*      stu.sztukowski@sas.com
+*         stu.sztukowski@sas.com
 *
 * Parameters: data      | dataset to get attribs from
 *             outmacvar | Macro variable to save attrib statements. Default: &attribs
@@ -32,10 +32,10 @@
 
 %put %bquote(&attribs.);
 
- data iris;
-     &attribs.;
-     set sashelp.iris;
- run;
+data iris;
+    &attribs.;
+    set sashelp.iris;
+run;
 
 (2) Get variable attributes from sashelp.air for a ds2 step;
 
@@ -63,24 +63,25 @@ proc ds2;
 quit;
 
 (3) Bring in variables for a hash table without needing to use a double set statement. This
-  prevents non-matching hash variables from carrying forward.
+    prevents non-matching hash variables from carrying forward.
 
-  %getattribs(data=sashelp.cars, keep=make model horsepower);
+%getattribs(data=sashelp.cars, keep=make model horsepower);
 
-  data cars;
-      &attribs.;
+data cars;
+    &attribs.;
 
-      set sashelp.cars(keep=make model);
+    set sashelp.cars(keep=make model);
 
-      if(_N_ = 1) then do;
-          dcl hash cars_h(dataset:'sashelp.cars');
-          cars_h.defineKey('make', 'model');
-          cars_h.defineData('horsepower');
-          cars_h.defineDone();
-      end;
+    if(_N_ = 1) then do;
+        dcl hash cars_h(dataset:'sashelp.cars');
+        cars_h.defineKey('make', 'model');
+        cars_h.defineData('horsepower');
+        cars_h.defineDone();
+    end;
   
-      rc = cars_h.Find();
-  run;
+    rc = cars_h.Find();
+run;
+
 *
 \******************************************************************************/
 
