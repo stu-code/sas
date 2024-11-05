@@ -186,7 +186,7 @@ run;
 
         %if(&type. = DATA) %then %do;
               compbl( cat('attrib '
-                    , cats("'", name, "'n")
+                    , nliteral(name)
                     , ' length=' /* v0.2 added space */
                     , CASE(type) when('char') then '$' else '' END
                     , length
@@ -293,22 +293,3 @@ run;
     %end;
 
 %mend getattribs;
-
-%getattribs(data=sashelp.cars, keep=make);
-
-data merge;
-    set lib.data;
-    
-    if(_N_ = 1) then do;
-        &attribs;
-        dcl hash h(dataset: 'sashelp.cars');
-            h.defineKey('model');
-            h.defineData('make');
-        h.defineDone();
-        call missing(model);
-    end;
-
-    rc = h.Find();
-
-    drop rc;
-run;
