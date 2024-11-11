@@ -9,6 +9,8 @@
 *
 *             MACRO
 * Parameters: strlist   | Space-separated string list
+*             quote     | Optional. Specify SINGLE or DOUBLE quotes. 
+*                         Default: DOUBLE
 *
 *             FUNCTION
 *             strlist   | Space-separated string list. Returns a length of 200 if none is assigned.
@@ -18,11 +20,15 @@
 *        
 * Example:
 
-  (1) Convert a space-separated list into a quoted, comma-separated list
+  (1) Convert a space-separated list into a double-quoted, comma-separated list
       %let list = a b c;
       %put %cquote(&list);
       
-  (2) Use a space-separted list in an IN operator:
+  (2) Convert a space-separated list into a single-quoted, comma-separated listed
+      %let list = a b c;
+      %put %cquote(&list, single);
+
+  (3) Use a space-separted list in an IN operator:
       %let list = BMW Mercedes Audi;
 
       data foo;
@@ -30,7 +36,7 @@
           where make IN(%cquote(&list));
       run;
 
-  (3) Convert a DATA Step string into a quoted list
+  (4) Convert a DATA Step string into a quoted list
 
       options cmplib=work.funcs;
 
@@ -42,12 +48,22 @@
 *
 \******************************************************************************/
 
-%macro cquote(strlist);
-    "%sysfunc(tranwrd(%qsysfunc(compbl(%superq(strlist))),%bquote( ),%bquote(",")))"
+%macro cquote(strlist, quote);
+    %if(%upcase(&quote) = SINGLE) %then %let q = %str(%');
+        %else %let q = %str(%");
+
+    %unquote(%bquote(&q)%qsysfunc(tranwrd(%qsysfunc(compbl(%superq(strlist))),%bquote( ),%bquote(&q,&q)))%bquote(&q))
 %mend;
 
 proc fcmp outlib=work.funcs.str;
+
+    /* Double quote version */
     function cquote(str$) $200;
         return (cats('"', tranwrd(compbl(str),' ','","'), '"'));
+    endfunc;
+
+    /* Single quote version */ 
+    function scquote(str$) $200;
+        return (cats("'", tranwrd(compbl(str),' ',"','"), "'"));
     endfunc;
 run;
