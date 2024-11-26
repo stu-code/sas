@@ -14,7 +14,6 @@
         data time;
             time1 = &time1;
             time2 = &time2;
-            time3 = &time3;
         run;
 
         proc append base=times data=time;
