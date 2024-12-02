@@ -1,7 +1,8 @@
 /******************************************************************************\
 * Name: getattribs.sas
 *
-* Purpose: Gets variable attributes from a dataset and stores the data step & ds2 attrib code into a single macro variable.
+* Purpose: Gets variable attributes from a dataset and stores the data step & ds2 attrib code 
+*          into a single macro variable.
 *
 *
 * Author: Stu Sztukowski
@@ -85,6 +86,19 @@ run;
 *
 \******************************************************************************/
 
+/****** Dependencies ******/
+
+/* Checks if a macro variable is null or exists. Keeps errors from occurring in
+    conditional statements if the macro variable does not exist. */
+%macro is_null(macvar);
+    %if %symexist(&macvar.) %then %do;
+        %sysevalf(%superq(%superq(macvar)) =, boolean)
+    %end;
+        %else 1
+%mend is_null;
+
+/****** End Dependencies ******/
+
 %macro getattribs(
   data=             /* Dataset to get var attributes */
 , outmacvar=attribs /* Output macro variable to save attrib statements. Default: &attribs. */
@@ -97,7 +111,7 @@ run;
 ) / minoperator mindelimiter=' ';
 
     %global &outmacvar.;
-    %local outname;
+    %local outname lib dsn;
 
     /* Remove case-sensitivity */
     %let data     = %upcase(&data.);
@@ -109,37 +123,18 @@ run;
     %let label    = %upcase(&label.);
     %let outname  = _outname_%sysfunc(round(%sysfunc(datetime())));
 
-    /****** Dependent Macros ******/
-
-    /* Parses libraries and dataset names from a one or two-level dataset name */
-    %macro util_parse_lib_dsn(data=, outlib=lib, outdsn=dsn);
-        %global &outlib &outdsn;
-
-        %if(%scan(%bquote(&data.), 2, .) = %str() ) %then %do;
-            %let &outlib = WORK;
-            %let &outdsn = %qcmpres(&data.);
+    /* Parse out the library and dataset name */
+    %if(%scan(%bquote(&data.), 2, .) = %str() ) %then %do;
+        %let lib = WORK;
+        %let dsn = %qcmpres(&data.);
+    %end;
+        %else %do;
+            %let lib = %qcmpres(%scan(%bquote(&data.), 1, .) );
+            %let dsn = %qcmpres(%scan(%bquote(&data.), 2, .) );
         %end;
-            %else %do;
-                %let &outlib = %qcmpres(%scan(%bquote(&data.), 1, .) );
-                %let &outdsn = %qcmpres(%scan(%bquote(&data.), 2, .) );
-            %end;
-    %mend util_parse_lib_dsn;
-
-    /* Checks if a macro variable is null or exists. Keeps errors from occurring in
-        conditional statements if the macro variable does not exist. */
-    %macro isnull(macvar);
-        %if %symexist(&macvar.) %then %do;
-            %sysevalf(%superq(%superq(macvar)) =, boolean)
-        %end;
-            %else 1
-    %mend isnull;
-
-    /****** End Dependent Macros ******/
-
-    %util_parse_lib_dsn(data=&data.);
 
     /* Error checking */
-    %if(%isnull(data) ) %then %do;
+    %if(%is_null(data) ) %then %do;
         %put ERROR: Must provide a dataset;
         %abort;
     %end;
@@ -154,22 +149,22 @@ run;
         %abort;
     %end;
 
-    %if(%isnull(keep) = 0 AND %isnull(drop) = 0) %then %do;
+    %if(%is_null(keep) = 0 AND %is_null(drop) = 0) %then %do;
         %put ERROR: Cannot have both drop and keep arguments at the same time.;
         %abort;
     %end;
 
     /* Create a list of variable names to keep or drop  */
-    %if(%isnull(keep) = 0 OR %isnull(drop) = 0) %then %do;
+    %if(%is_null(keep) = 0 OR %is_null(drop) = 0) %then %do;
 
         proc transpose 
             data=&data.(obs=0 
 
-                        %if(%isnull(keep) = 0) %then %do;
+                        %if(%is_null(keep) = 0) %then %do;
                             keep=&keep.
                         %end;
 
-                        %else %if(%isnull(drop) = 0) %then %do;
+                        %else %if(%is_null(drop) = 0) %then %do;
                             drop=&drop.
                         %end;
                         )
@@ -277,14 +272,14 @@ run;
              AND memname = "&dsn."
 
         /* Filter to only the list of variables to keep or drop */
-        %if(%isnull(keep) = 0 OR %isnull(drop) = 0) %then %do;
+        %if(%is_null(keep) = 0 OR %is_null(drop) = 0) %then %do;
             AND name IN(select name from &outname.)
         %end;
     ;
     quit;
 
     /* Remove the temporary var dataset */
-    %if(%isnull(keep) = 0 OR %isnull(drop) = 0) %then %do;
+    %if(%is_null(keep) = 0 OR %is_null(drop) = 0) %then %do;
 
         proc datasets lib=work nolist nowarn;
             delete &outname.;
