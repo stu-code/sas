@@ -1,19 +1,46 @@
-/* Runs code 100 times and calculates the avg and std of it */
+/* Runs code a defined number of times and calculates the avg and std of 
+   how long it took across all runs. 
+   Default: 100 trials */
 
-%macro timeit;
-    %do i = 1 %to 100;
+%macro timeit(trials=100);
+    %local i j t n;
 
+    %do t = 1 %to &trials;
+
+        /* Do not change */
+        %let n = 0;
+
+     /* Define your code chunks below 
+
+        **** Important ****
+
+        You must increment the variable n with each code chunk. To create 
+        a code chunk to test, use this skeleton code:
+
+        %let n = %eval(&n+1);
+        %let start=%sysfunc(datetime());
+            <code>
+        %let time&n = %sysevalf(%sysfunc(datetime())-&start); 
+      */
+
+        /* Code 1 */
+        %let n = %eval(&n+1);
         %let start=%sysfunc(datetime());
             /* Code here */
-        %let time1 = %sysevalf(%sysfunc(datetime())-&start);
+        %let time&n = %sysevalf(%sysfunc(datetime())-&start);
 
+        /* Code 2 */
+        %let n = %eval(&n+1);
         %let start=%sysfunc(datetime());
             /* Code here */
-        %let time2 = %sysevalf(%sysfunc(datetime())-&start);
+        %let time&n = %sysevalf(%sysfunc(datetime())-&start);
+
+        /* ... */
 
         data time;
-            time1 = &time1;
-            time2 = &time2;
+            %do i = 1 %to &n;
+                time&i = &&time&i;
+            %end;
         run;
 
         proc append base=times data=time;
@@ -21,10 +48,13 @@
     %end;
 
     proc sql;
-        select mean(time1) as avg_time1 label='Avg: '
-             , std(time1)  as std_time1 label='Std: '
-             , mean(time2) as avg_time2 label='Avg: '
-             , std(time2)  as std_time2 label='Std: '
+        select mean(time1) as avg_time1 label="Avg: Method 1"
+             , std(time1)  as std_time1 label="Std: Method 1"
+             %do i = 1 %to &n;
+             , mean(time&i) as avg_time&i label="Avg: Method &i"
+             , std(time&i)  as std_time&i label="Std: Method &i"
+             %end;
+
         from times;
     quit;
 
@@ -33,5 +63,3 @@
     quit;
 
 %mend;
-
-%timeit;
