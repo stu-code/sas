@@ -13,8 +13,7 @@
 
     %do t = 1 %to &trials;
 
-        /* Do not change */
-        %let n = 0;
+        %let n = 0; /* Do not change */
 
      /* Define your code chunks below 
 
