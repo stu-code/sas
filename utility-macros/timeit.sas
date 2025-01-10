@@ -9,7 +9,10 @@
    Default: 100 trials */
 
 %macro timeit(trials=100);
-    %local i n t;
+    %local i n t start;
+    %do i = 1 %to 10;
+        %local time&i;
+    %end;
 
     %do t = 1 %to &trials;
 
