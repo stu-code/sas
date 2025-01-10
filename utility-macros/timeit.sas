@@ -1,9 +1,15 @@
-/* Runs code a defined number of times and calculates the avg and std of 
+/* TODO: Make a header
+   Author: Stu Sztukowski
+
+   This macro is inspired by the %%timeit magic command in Jupyter notebooks.
+
+   Runs code a defined number of times and calculates the avg and std of 
    how long it took across all runs. 
+
    Default: 100 trials */
 
 %macro timeit(trials=100);
-    %local i j t n;
+    %local i n t;
 
     %do t = 1 %to &trials;
 
