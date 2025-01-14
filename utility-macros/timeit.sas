@@ -41,7 +41,7 @@
         a code chunk to test, use this skeleton code:
 
         %let n      = %eval(&n+1);
-        %let desc&n = Method 1;
+        %let desc&n = Short description here;
         %let start  = %sysfunc(datetime());
             <code>
         %let time&n = %sysevalf(%sysfunc(datetime())-&start); 
