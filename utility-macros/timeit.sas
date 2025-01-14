@@ -88,4 +88,3 @@
     quit;
 
 %mend;
-%timeit;
