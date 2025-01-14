@@ -1,12 +1,25 @@
-/* TODO: Make a header
-   Author: Stu Sztukowski
+/******************************************************************************\
+* Name: timeit.sas
+*
+* Purpose: Skeleton macro inspired by the %%timeit magic function in Jupyter Notebooks to
+*           help time and compare different code. This is great for identifying how 
+*           long code runs on average, or for testing if one method is faster than another method.
+*           Supports as many code chunks as you want to add.
+*
+* Author: Stu Sztukowski
+*         stu.sztukowski@sas.com
+*
+* Parameters: trials | The number of times you want to run your code to calculate statistics.
+*                      Default: 100      
+*
+* Usage: Use to test one or more code chunks to see how long it takes to run, on average
+*        
+* IMPORTANT: Be careful if testing macro functions. Make sure that you have local variables set for
+*            common looping values like i, j, k, n, t, time1, time2, time3, etc. 
+*            Failing to do so could cause the program to run in an infinite loop, end early, 
+*            or have unexpected results.
+\******************************************************************************/
 
-   This macro is inspired by the %%timeit magic command in Jupyter notebooks.
-
-   Runs code a defined number of times and calculates the avg and std of 
-   how long it took across all runs. 
-
-   Default: 100 trials */
 
 %macro timeit(trials=100);
     %local i n t start;
