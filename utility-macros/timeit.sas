@@ -15,17 +15,19 @@
 * Usage: Use to test one or more code chunks to see how long it takes to run, on average
 *        
 * IMPORTANT: Be careful if testing macro functions. Make sure that you have local variables set for
-*            common looping values like i, j, k, n, t, time1, time2, time3, etc. 
+*            common looping values like i, j, k, n, t, now, time1, time2, time3, etc. 
 *            Failing to do so could cause the program to run in an infinite loop, end early, 
 *            or have unexpected results.
 \******************************************************************************/
 
-
 %macro timeit(trials=100);
-    %local i n t start;
+    %local i n t start now;
     %do i = 1 %to 10;
         %local time&i;
+        %local desc&i;
     %end;
+
+    %let now = %sysfunc(transtrn(%sysfunc(datetime()), ., %str()));
 
     %do t = 1 %to &trials;
 
@@ -39,48 +41,51 @@
         a code chunk to test, use this skeleton code:
 
         %let n = %eval(&n+1);
-        %let start=%sysfunc(datetime());
+        %let desc&n = Method 1;
+        %let start = %sysfunc(datetime());
             <code>
         %let time&n = %sysevalf(%sysfunc(datetime())-&start); 
      */
-
-        /* Code 1 */
-        %let n = %eval(&n+1);
-        %let start=%sysfunc(datetime());
+        /**** Code 1 ****/
+        %let n      = %eval(&n+1);
+        %let desc&n = Method 1;
+        %let start  = %sysfunc(datetime());
             /* Code here */
         %let time&n = %sysevalf(%sysfunc(datetime())-&start);
 
-        /* Code 2 */
-        %let n = %eval(&n+1);
-        %let start=%sysfunc(datetime());
+        /**** Code 2 ****/
+        %let n      = %eval(&n+1);
+        %let desc&n = Method 2;
+        %let start  = %sysfunc(datetime());
             /* Code here */
         %let time&n = %sysevalf(%sysfunc(datetime())-&start);
 
-        /* ... */
+        /**** ... ****/
 
-        data time;
+        data trial_&now;
             %do i = 1 %to &n;
                 time&i = &&time&i;
             %end;
         run;
 
-        proc append base=times data=time;
+        proc append base=times_&now data=trial_&now;
         run;
     %end;
 
     proc sql;
-        select mean(time1) as avg_time1 label="Avg: Method 1"
-             , std(time1)  as std_time1 label="Std: Method 1"
-             %do i = 1 %to &n;
-             , mean(time&i) as avg_time&i label="Avg: Method &i"
-             , std(time&i)  as std_time&i label="Std: Method &i"
+        select mean(time1) as avg_time1 label="Avg (s): &desc1" format=8.3
+             , std(time1)  as std_time1 label="Std (s): &desc1" format=8.3
+             %do i = 2 %to &n;
+             , mean(time&i) as avg_time&i label="Avg (s): &&desc&i" format=8.3
+             , std(time&i)  as std_time&i label="Std (s): &&desc&i" format=8.3
              %end;
 
-        from times;
+        from times_&now;
     quit;
 
     proc datasets lib=work nolist;
-        delete times;
+        delete trial_&now times_&now;
     quit;
 
 %mend;
+%timeit;
