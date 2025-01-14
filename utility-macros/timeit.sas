@@ -1,7 +1,7 @@
 /******************************************************************************\
 * Name: timeit.sas
 *
-* Purpose: Skeleton macro inspired by the %%timeit magic function in Jupyter Notebooks to
+* Purpose: Skeleton macro inspired by the %timeit magic function in Jupyter Notebooks to
 *           help time and compare different code. This is great for identifying how 
 *           long code runs on average, or for testing if one method is faster than another method.
 *           Supports as many code chunks as you want to add.
