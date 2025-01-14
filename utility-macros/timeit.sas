@@ -50,27 +50,27 @@
      */
 
         /*************************************************************/
-        /************************* Code Here *************************/
+        /********************* Code Blocks Here **********************/
         /*************************************************************/
 
         /**** Code 1 ****/
         %let n      = %eval(&n+1);
         %let desc&n = Method 1;
         %let start  = %sysfunc(datetime());
-            /* Code here */
+            /* Put Code To Test here */
         %let time&n = %sysevalf(%sysfunc(datetime())-&start);
 
         /**** Code 2 ****/
         %let n      = %eval(&n+1);
         %let desc&n = Method 2;
         %let start  = %sysfunc(datetime());
-            /* Code here */
+            /* Put Code To Test here */
         %let time&n = %sysevalf(%sysfunc(datetime())-&start);
 
         /**** ... ****/
 
         /*************************************************************/
-        /*********************** End Code Here ***********************/
+        /******************* End Code Blocks Here ********************/
         /*************************************************************/
 
         data trial_&now;
