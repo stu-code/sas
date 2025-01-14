@@ -15,12 +15,14 @@
 * Usage: Use to test one or more code chunks to see how long it takes to run, on average
 *        
 * IMPORTANT: Be careful if testing macro functions. Make sure that you have local variables set for
-*            common looping values like i, j, k, n, t, now, time1, time2, time3, etc. 
+*            common macro values like i, j, k, n, t, now, time1, time2, time3, desc1, desc2, desc3, etc. 
 *            Failing to do so could cause the program to run in an infinite loop, end early, 
 *            or have unexpected results.
 \******************************************************************************/
 
 %macro timeit(trials=100);
+
+    /* If testing macro functions, make sure these are local */
     %local i n t start now;
     %do i = 1 %to 10;
         %local time&i;
