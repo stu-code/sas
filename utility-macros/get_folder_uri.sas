@@ -28,12 +28,12 @@
 
         /* Build a folder list as we go along: e.g. /foo/bar/... */
         %if(&i = 1) %then %let pathlist = /&name;
-          %else %let pathlist = &pathlist/&name;
+            %else %let pathlist = &pathlist/&name;
 
         /* For the first endpoint, use rootFolders.
            Otherwise, get the members of the next folder. */
         %if(&i = 1) %then %let endpoint = rootFolders;
-          %else %let endpoint = folders/&uri/members;
+            %else %let endpoint = folders/&uri/members;
       
         filename resp temp;
         
@@ -47,6 +47,12 @@
             headers "Accept"="application/json";
         run;
         
+        %if(&SYS_PROCHTTP_STATUS_CODE NE 200) %then %do;
+            %put ERROR: Did not receive a 200 OK status code from the server. The status code is: &SYS_PROCHTTP_STATUS_CODE &SYS_PROCHTTP_STATUS_PHRASE..;
+            %put Test URL: &url/folders/&endpoint;
+            %abort;
+        %end;
+
         libname r json fileref=resp;
 
         /* Error checking: If the folder does not exist, stop */
