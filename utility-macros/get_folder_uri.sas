@@ -5,6 +5,7 @@
 *		   a test URL to confirm.
 *
 * Author: Stu Sztukowski
+*		  stu.sztukowski@sas.com
 *
 * Parameters: path | Full folder path. For example: /foo/bar/baz
 *
@@ -28,8 +29,8 @@
 		%let name = %scan(&path, &i, /);
 
 		/* Build a folder list as we go along: e.g. /foo/bar/... */
-		%if(&i = 1) %then %let folderlist = /&name;
-			%else %let folderlist = &pathlist/&name;
+		%if(&i = 1) %then %let pathlist = /&name;
+			%else %let pathlist = &pathlist/&name;
 
 		/* For the first endpoint, use rootFolders.
 		   Otherwise, get the members of the next folder. */
