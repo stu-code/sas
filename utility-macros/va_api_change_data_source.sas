@@ -15,9 +15,7 @@
 *        the changeData operation in updateReport in the REST API documentation:
 *
 *        https://developer.sas.com/rest-apis/visualAnalytics/updateReport
-*          
 *
-*        
 /******************************************************************************/
 
 %let report = REPORT URI HERE;          * URI of the report. Not the name. Get this from Copy Link in VA;
@@ -33,11 +31,11 @@ filename resp temp;
    The parts you need to change are surrounded by stars * and start with "CHANGEME:"
 */
 proc http
-	url   = "&url/visualAnalytics/reports/&report"
-	method = PUT
-	out    = resp
-	oauth_bearer=sas_services /* Easy OAuth authentication */
-	in='
+    url    = "&url/visualAnalytics/reports/&report"
+    method = PUT
+    out    = resp
+    oauth_bearer=sas_services /* Easy OAuth authentication */
+    in='
 {
     "version": 1,
     "resultFolder": "/folders/folders/&folder",
@@ -48,15 +46,15 @@ proc http
         "changeData": {
           "originalData": {
             "cas": {
-			  "server":  "cas-shared-default",
-			  "library": "**** CHANGEME: OLD LIBRARY NAME GOES HERE **** ",
+        "server":  "cas-shared-default",
+        "library": "**** CHANGEME: OLD LIBRARY NAME GOES HERE **** ",
               "table":   "**** CHANGEME: OLD TABLE NAME GOES HERE ****"
             }
           },
           "replacementData": {
             "cas": {
-			  "server":  "cas-shared-default",
-			  "library": "**** CHANGEME: NEW LIBRARY NAME GOES HERE **** ",
+        "server":  "cas-shared-default",
+        "library": "**** CHANGEME: NEW LIBRARY NAME GOES HERE **** ",
               "table":   "**** CHANGEME: NEW TABLE NAME GOES HERE ****"
             }
           }
@@ -65,16 +63,17 @@ proc http
     ]
 }
 '
-	;
-	headers
-		"If-Unmodified-Since"="Fri, 01 Jan 9999 00:00:00 GMT"
-		"Content-Type"="application/json"
-		"Accept"="application/json";
+    ;
+    headers
+        "If-Unmodified-Since"="Fri, 01 Jan 9999 00:00:00 GMT"
+        "Content-Type"="application/json"
+        "Accept"="application/json"
+    ;
 run;
 
 /* Print the result to the log */
 data _null_;
-	infile resp;
-	input;
-	put _INFILE_;
+    infile resp;
+    input;
+    put _INFILE_;
 run;
