@@ -7,8 +7,11 @@
 * Author: Stu Sztukowski
 *
 * Parameters: path | Full folder path. For example: /foo/bar/baz
+*					 IF USING WILDCARDS:
+*					 Specify only the wildcard with an @ and no preceding /
+*					 For example, to get the URI for My Folder, use @myFolder
 *
-* Usage: Use this to find the folder URI. For example, when using
+* Usage: Use this to find the folder URI in Viya. For example, when using
 *        the SAS Viya API to output content to a specific folder.
 *        To confirm that the folder is as expected, use the test URL
 *        output in the log.
@@ -16,6 +19,7 @@
 *        
 * Example: %get_folder_uri(/Public);
 *          %get_folder_uri(/Products/SAS Visual Analytics);
+*		   %get_folder_uri(@myFolder)
 *
 /******************************************************************************/
 
@@ -23,22 +27,44 @@
     %let url = %sysfunc(getoption(SERVICESBASEURL));
     %let uri=;
 
-    %do i = 1 %to %sysfunc(count(&path, /));
+	%let path = %superq(path);
+
+	/* Detect wildcard */
+    %if(%qsubstr(&path,1,1) = @) %then %let wildcard = 1;
+        %else %let wildcard = 0;
+
+	/* If there is no wildcard, calculate the number of folders and
+	   read from r.items. Otherwise, set it to 1 and read from r.root since
+	   r.items doesn't exist when using a wildcard */
+	%if(NOT &wildcard) %then %do;
+		%let n_folders = %sysfunc(count(&path, /));
+		%let readfrom  = r.items;
+	%end;
+		%else %do;
+			%let n_folders = 1;
+			%let readfrom  = r.root;
+		%end;
+
+    %do i = 1 %to &n_folders;
         %let name = %scan(&path, &i, /);
 
-        /* Build a folder list as we go along: e.g. /foo/bar/... */
-        %if(&i = 1) %then %let pathlist = /&name;
-            %else %let pathlist = &pathlist/&name;
+        /* Build a folder list as we go along: e.g. /foo/bar/... 
+		   Except for wildcards */
+        %if(&i = 1 AND NOT &wildcard) %then %let pathlist = /&name;
+            %else %if(NOT &wildcard) %then %let pathlist = &pathlist/&name;
+				%else %let pathlist = &name;
 
-        /* For the first endpoint, use rootFolders.
-           Otherwise, get the members of the next folder. */
-        %if(&i = 1) %then %let endpoint = rootFolders;
-            %else %let endpoint = folders/&uri/members;
-      
+        /* 1. First iteration and not a wildcard: Must use rootFolders
+		   2. If first iteration and a wildcard; Must go directly to the folder (e.g./folders/folders/@myFolder) 
+		   3. Otherwise, get the members from the URI */
+        %if(&i = 1 AND NOT &wildcard) %then %let endpoint = rootFolders; 
+            %else %if(&i = 1 AND &wildcard) %then %let endpoint = folders/&path; 
+                %else %let endpoint = folders/&uri/members;
+
         filename resp temp;
 
         proc http
-            url="&url/folders/&endpoint?filter=eq(name, %tslit(&name))"
+            url="&url/folders/&endpoint?filter=eq(name, '&name')"
             method=GET
             out=resp
             oauth_bearer=sas_services;
@@ -56,8 +82,13 @@
         /* Error checking: If the folder does not exist, stop */
         proc sql noprint;
             select *
-            from r.items
-            where upcase(name) = upcase("&name");
+            from &readfrom
+
+			/* Doesn't work with r.items */
+			%if(NOT &wildcard) %then %do;
+				where upcase(name) = upcase("&name") 
+			%end;
+			;
         quit;
 
         %if(&sqlobs = 0) %then %do;
@@ -67,12 +98,16 @@
 
         /* Otherwise, get the URI */
         data _null_;
-            set r.items;
-            where upcase(name) = upcase("&name");
+            set &readfrom;
+
+			/* Doesn't work with r.items */
+			%if(NOT &wildcard) %then %do;
+				where upcase(name) = upcase("&name"); 
+			%end;
 
             /* For the first URI, you must use the ID variable */
             %if(&i = 1) %then %do;
-              folder_uri = id;
+            	folder_uri = id;
             %end;
 
             /* Otherwise, you must get it from the URI variable */
@@ -84,8 +119,12 @@
         run;
     %end;
 
+    /* Display the right endpoint for only one folder */
+    %if(&n_folders = 1 AND NOT &wildcard) %then %let test_url = &url/folders/&endpoint/&uri;
+        %else %let test_url = &url/folders/&endpoint;
+
     %put **************************************************;
     %put URI for &pathlist: &uri;
-    %put Test URL: &url/folders/&endpoint;
+    %put Test URL: &test_url;
     %put **************************************************;
 %mend;
