@@ -6,7 +6,7 @@
 *
 * Author: Stu Sztukowski
 *
-* Parameters: path  | Full folder path. For example: /foo/bar/baz
+* Parameters: path | Full folder path. For example: /foo/bar/baz
 *
 * Usage: Use this to find the folder URI. For example, when using
 *        the SAS Viya API to output content to a specific folder.
