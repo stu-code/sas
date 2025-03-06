@@ -119,12 +119,8 @@
         run;
     %end;
 
-    /* Display the right endpoint for only one folder */
-    %if(&n_folders = 1 AND NOT &wildcard) %then %let test_url = &url/folders/&endpoint/&uri;
-        %else %let test_url = &url/folders/&endpoint;
-
     %put **************************************************;
     %put URI for &pathlist: &uri;
-    %put Test URL: &test_url;
+    %put Test URL: &url/folders/folders/&uri;
     %put **************************************************;
 %mend;
