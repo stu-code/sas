@@ -7,9 +7,9 @@
 * Author: Stu Sztukowski
 *
 * Parameters: path | Full folder path. For example: /foo/bar/baz
-*					 IF USING WILDCARDS:
-*					 Specify only the wildcard with an @ and no preceding /
-*					 For example, to get the URI for My Folder, use @myFolder
+*             IF USING WILDCARDS:
+*             Specify only the wildcard with an @ and no preceding /
+*             For example, to get the URI for My Folder, use @myFolder
 *
 * Usage: Use this to find the folder URI in Viya. For example, when using
 *        the SAS Viya API to output content to a specific folder.
@@ -19,7 +19,7 @@
 *        
 * Example: %get_folder_uri(/Public);
 *          %get_folder_uri(/Products/SAS Visual Analytics);
-*		   %get_folder_uri(@myFolder)
+*          %get_folder_uri(@myFolder)
 *
 /******************************************************************************/
 
@@ -27,36 +27,36 @@
     %let url = %sysfunc(getoption(SERVICESBASEURL));
     %let uri=;
 
-	%let path = %superq(path);
+    %let path = %superq(path);
 
-	/* Detect wildcard */
+    /* Detect wildcard */
     %if(%qsubstr(&path,1,1) = @) %then %let wildcard = 1;
         %else %let wildcard = 0;
 
-	/* If there is no wildcard, calculate the number of folders and
-	   read from r.items. Otherwise, set it to 1 and read from r.root since
-	   r.items doesn't exist when using a wildcard */
-	%if(NOT &wildcard) %then %do;
-		%let n_folders = %sysfunc(count(&path, /));
-		%let readfrom  = r.items;
-	%end;
-		%else %do;
-			%let n_folders = 1;
-			%let readfrom  = r.root;
-		%end;
+    /* If there is no wildcard, calculate the number of folders and
+       read from r.items. Otherwise, set it to 1 and read from r.root since
+       r.items doesn't exist when using a wildcard */
+    %if(NOT &wildcard) %then %do;
+        %let n_folders = %sysfunc(count(&path, /));
+        %let readfrom  = r.items;
+    %end;
+        %else %do;
+            %let n_folders = 1;
+            %let readfrom  = r.root;
+        %end;
 
     %do i = 1 %to &n_folders;
         %let name = %scan(&path, &i, /);
 
         /* Build a folder list as we go along: e.g. /foo/bar/... 
-		   Except for wildcards */
+           Except for wildcards */
         %if(&i = 1 AND NOT &wildcard) %then %let pathlist = /&name;
             %else %if(NOT &wildcard) %then %let pathlist = &pathlist/&name;
-				%else %let pathlist = &name;
+                %else %let pathlist = &name;
 
-        /* 1. First iteration and not a wildcard: Must use rootFolders
-		   2. If first iteration and a wildcard; Must go directly to the folder (e.g./folders/folders/@myFolder) 
-		   3. Otherwise, get the members from the URI */
+    /* 1. First iteration and not a wildcard: Must use rootFolders
+       2. If first iteration and a wildcard; Must go directly to the folder (e.g./folders/folders/@myFolder) 
+       3. Otherwise, get the members from the URI */
         %if(&i = 1 AND NOT &wildcard) %then %let endpoint = rootFolders; 
             %else %if(&i = 1 AND &wildcard) %then %let endpoint = folders/&path; 
                 %else %let endpoint = folders/&uri/members;
@@ -84,11 +84,11 @@
             select *
             from &readfrom
 
-			/* Doesn't work with r.items */
-			%if(NOT &wildcard) %then %do;
-				where upcase(name) = upcase("&name") 
-			%end;
-			;
+            /* Doesn't work with r.items */
+            %if(NOT &wildcard) %then %do;
+                where upcase(name) = upcase("&name") 
+            %end;
+            ;
         quit;
 
         %if(&sqlobs = 0) %then %do;
@@ -100,19 +100,19 @@
         data _null_;
             set &readfrom;
 
-			/* Doesn't work with r.items */
-			%if(NOT &wildcard) %then %do;
-				where upcase(name) = upcase("&name"); 
-			%end;
+            /* Doesn't work with r.items */
+            %if(NOT &wildcard) %then %do;
+                where upcase(name) = upcase("&name"); 
+            %end;
 
             /* For the first URI, you must use the ID variable */
             %if(&i = 1) %then %do;
-            	folder_uri = id;
+                folder_uri = id;
             %end;
 
             /* Otherwise, you must get it from the URI variable */
             %else %do;
-              folder_uri = scan(uri, -1, '/');
+                folder_uri = scan(uri, -1, '/');
             %end;
 
             call symputx('uri', folder_uri);
