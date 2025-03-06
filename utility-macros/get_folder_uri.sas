@@ -6,7 +6,7 @@
 *
 * Author: Stu Sztukowski
 *
-* Parameters: path | Full folder path. For example: /foo/bar/baz
+* Parameters: path  | Full folder path. For example: /foo/bar/baz
 *
 * Usage: Use this to find the folder URI. For example, when using
 *        the SAS Viya API to output content to a specific folder.
@@ -36,11 +36,9 @@
             %else %let endpoint = folders/&uri/members;
       
         filename resp temp;
-        
-        %put &name: &uri;
 
         proc http
-            url="&url/folders/&endpoint"
+            url="&url/folders/&endpoint?filter=eq(name, %tslit(&name))"
             method=GET
             out=resp
             oauth_bearer=sas_services;
@@ -63,7 +61,7 @@
         quit;
 
         %if(&sqlobs = 0) %then %do;
-            %put ERROR: Folder &pathlist was not found. Check that the the folder &path exists or is spelled correctly and try again.;
+            %put ERROR: Folder &pathlist was not found. Check that the the folder &path exists,  is spelled correctly, or has correct casing and try again.;
             %abort;
         %end;
 
