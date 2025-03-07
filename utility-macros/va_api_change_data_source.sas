@@ -10,7 +10,7 @@
 *                      https://github.com/stu-code/sas/blob/master/utility-macros/get_folder_uri.sas
 *
 * Usage: Use this to change a data source in Visual Analytics from SAS Studio.
-*        The areas you need to change in the JSON payload are marked with stars (*).
+*        The areas you need to change in the JSON payload are prefixed with CHANGEME.
 *        For more information on how to change a data source in Visual Analytics, see
 *        the changeData operation in updateReport in the REST API documentation:
 *
@@ -18,8 +18,8 @@
 *
 /******************************************************************************/
 
-%let report = REPORT URI HERE;          * URI of the report. Not the name. Get this from Copy Link in VA;
-%let folder = OUTPUT FOLDER URI HERE;   * URI of the folder. Not the name. Get this from the /folders/folders endpoint;
+%let report = CHANGEME: REPORT URI HERE;          * URI of the report. Not the name. Get this from Copy Link in VA;
+%let folder = CHANGEME: OUTPUT FOLDER URI HERE;   * URI of the folder. Not the name. Get this from the /folders/folders endpoint;
 %let url    = %sysfunc(getoption(SERVICESBASEURL)); *Automaticaly get the URL from the SAS server;
 
 filename resp temp;
