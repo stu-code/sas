@@ -10,7 +10,19 @@
 *             IF USING WILDCARDS:
 *             Specify only the wildcard with an @ and no preceding /
 *             For example, to get the URI for My Folder, use @myFolder
+*             
+*             Common wildcards:
+*             @myFolder      | Your home folder
+*             @myHistory     | History of files you've looked at
+*             @myFavorites   | Your favorites
+*             @appDataFolder | Your application data folder
+*             @myRecycleBin  | Your recycle bin when you delete things
+*             @public        | The Public folder
+*             @products      | The Products folder
 *
+*             For a list of all wildcards on your system,
+*             go to the /folders?limit=100 endpoint.
+*           
 * Usage: Use this to find the folder URI in Viya. For example, when using
 *        the SAS Viya API to output content to a specific folder.
 *        To confirm that the folder is as expected, use the test URL
