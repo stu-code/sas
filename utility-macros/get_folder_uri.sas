@@ -96,7 +96,7 @@
             select *
             from &readfrom
 
-            /* Doesn't work with r.items */
+            /* Doesn't work with r.root */
             %if(NOT &wildcard) %then %do;
                 where upcase(name) = upcase("&name") 
             %end;
@@ -112,7 +112,7 @@
         data _null_;
             set &readfrom;
 
-            /* Doesn't work with r.items */
+            /* Doesn't work with r.root */
             %if(NOT &wildcard) %then %do;
                 where upcase(name) = upcase("&name"); 
             %end;
