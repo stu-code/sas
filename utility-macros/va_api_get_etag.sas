@@ -29,7 +29,6 @@
     %global &outmacvar;
 
     %let url  = %sysfunc(getoption(SERVICESBASEURL));
-    %let resp = r%substr(%sysfunc(datetime()), 1, 7);
     %let hout = h%substr(%sysfunc(datetime()), 1, 7);
 
     filename &hout temp;
