@@ -2,7 +2,7 @@
 * Name: va_legacy_api_change_datasource.sas
 *
 * Purpose: Skeleton code to change the data source of a Visual Analytics report using the legacy
-*		   reportTransforms API
+*       reportTransforms API
 *
 * Author: Stu Sztukowski
 *
@@ -17,7 +17,7 @@
 *
 /******************************************************************************/
 
-%let report = CHANGEME: REPORT URI HERE;   			  * URI of the report. Not the name. Get this from Copy Link in VA;
+%let report = REPORT URI HERE;                        * URI of the report. Not the name. Get this from Copy Link in VA;
 %let url    = %sysfunc(getoption(SERVICESBASEURL));   * Automaticaly get the URL from the SAS server;
 
 filename resp temp;
@@ -28,7 +28,7 @@ proc http
     url       = "&url/reports/reports/&report"
     method    = GET
     out       = resp
-	headerout = hout
+    headerout = hout
     oauth_bearer=sas_services;
 run;
 
@@ -36,8 +36,8 @@ data _null_;
     infile hout;
     input;
     put _INFILE_;
-	
-	if(_INFILE_ =: "ETag:") then call symputx('etag', scan(_INFILE_, 2, ':'));
+  
+    if(_INFILE_ =: "ETag:") then call symputx('etag', scan(_INFILE_, 2, ':'));
 run;
 
 /* Send a JSON payload using the changeData operation from the Report Transforms API.
@@ -54,21 +54,21 @@ proc http
     in='
 
 {
-	"dataSources": [
- 	{
+  "dataSources": [
+   {
       "purpose": "original",
       "namePattern": "serverLibraryTable",
       "server": "cas-shared-default",
-      "library": "**** CHANGEME: ORIGINAL LIBRARY ****",
-      "table": "**** CHANGEME: ORIGINAL TABLE ****"
+      "library": "Public",
+      "table": "CARS"
     },
     {
       "purpose": "replacement",
-	  "namePattern": "serverLibraryTable",
+      "namePattern": "serverLibraryTable",
       "server": "cas-shared-default",
-      "library": "**** CHANGEME: REPLACEMENT LIBRARY ****",
-      "table": "**** CHANGEME: REPLACEMENT TABLE ****",
-	  "replacementLabel": "CARSSASHELP"
+      "library": "Public",
+      "table": "CARSSASHELP",
+      "replacementLabel": "CARSSASHELP"
     }
   ]
 }
