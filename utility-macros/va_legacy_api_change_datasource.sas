@@ -8,6 +8,8 @@
 *
 * Parameters: report | The report URI. You can get this from "Copy Link"
 *
+* Dependencies: %get_etag: https://raw.githubusercontent.com/stu-code/sas/refs/heads/master/utility-macros/va_api_get_etag.sas
+*
 * Usage: Use this to change a data source in Visual Analytics from SAS Studio in Viya 3.5.
 *        The areas you need to change in the JSON payload are prefixed with CHANGEME.
 *        For more information on how to change a data source in Visual Analytics, see
