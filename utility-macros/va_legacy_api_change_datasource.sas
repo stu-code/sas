@@ -2,7 +2,7 @@
 * Name: va_legacy_api_change_datasource.sas
 *
 * Purpose: Skeleton code to change the data source of a Visual Analytics report using the legacy
-*       reportTransforms API
+*          reportTransforms API
 *
 * Author: Stu Sztukowski
 *
