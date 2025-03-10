@@ -17,7 +17,7 @@
 *
 /******************************************************************************/
 
-%let report = REPORT URI HERE;                        * URI of the report. Not the name. Get this from Copy Link in VA;
+%let report = CHANGEME: REPORT URI HERE;              * URI of the report. Not the name. Get this from Copy Link in VA;
 %let url    = %sysfunc(getoption(SERVICESBASEURL));   * Automaticaly get the URL from the SAS server;
 
 filename resp temp;
@@ -59,16 +59,16 @@ proc http
       "purpose": "original",
       "namePattern": "serverLibraryTable",
       "server": "cas-shared-default",
-      "library": "Public",
-      "table": "CARS"
+      "library": "***** CHANGEME: ORIGINAL LIBRARY *****",
+      "table": "***** CHANGEME: ORIGINAL TABLE *****"
     },
     {
       "purpose": "replacement",
       "namePattern": "serverLibraryTable",
       "server": "cas-shared-default",
-      "library": "Public",
-      "table": "CARSSASHELP",
-      "replacementLabel": "CARSSASHELP"
+      "library": "***** CHANGEME: NEW LIBRARY *****",
+      "table": "***** CHANGEME: NEW TABLE *****",
+      "replacementLabel": "***** CHANGEME: THE SAME NAME AS NEW TABLE *****"
     }
   ]
 }
