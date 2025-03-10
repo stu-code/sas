@@ -20,32 +20,11 @@
 %let report = CHANGEME: REPORT URI HERE;              * URI of the report. Not the name. Get this from Copy Link in VA;
 %let url    = %sysfunc(getoption(SERVICESBASEURL));   * Automaticaly get the URL from the SAS server;
 
-filename resp temp;
-filename hout temp;
-
 /***** Get etag *****/
-proc http
-    url       = "&url/reports/reports/&report"
-    method    = GET
-    out       = resp
-    headerout = hout
-    oauth_bearer=sas_services;
-run;
+filename etagmac url "https://raw.githubusercontent.com/stu-code/sas/refs/heads/master/utility-macros/va_api_get_etag.sas";
+%include etagmac;
+%get_etag(&report);
 
-data _null_;
-    infile hout;
-    input;
-    put _INFILE_;
-  
-    if(_INFILE_ =: "ETag:") then call symputx('etag', scan(_INFILE_, 2, ':'));
-run;
-
-/* Send a JSON payload using the changeData operation from the Report Transforms API.
-   The VA API is located at:
-   https://your-viya-server.com/reportTransforms/dataMappedReports/{report ID}
-
-   This changes the table CARS in PUBLIC to CARSSASHELP in Public
-*/
 proc http
     url    = "&url/reportTransforms/dataMappedReports/&report"
     method = PUT
