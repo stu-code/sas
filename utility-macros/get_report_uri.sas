@@ -110,5 +110,3 @@
             libname j&t clear;
         %end;
 %mend;
-
-%get_report_uri(@public/Reports/SAS Data Advisor);
