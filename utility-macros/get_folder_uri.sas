@@ -1,8 +1,8 @@
 /******************************************************************************\
 * Name: get_folder_uri
 *
-* Purpose: Returns the URI of a folder in Viya in the log and gives you
-*          a test URL to confirm.
+* Purpose: Returns the URI of a folder in Viya in the log or a macro variable
+*          and optionally gives you a test URL to confirm.
 *
 * Author: Stu Sztukowski
 *
@@ -23,62 +23,73 @@
 *             For a list of all wildcards on your system,
 *             go to the /folders?limit=100 endpoint.
 *           
+*             outmacvar | The output macro variable for the URI. 
+*                         Default: uri
+*             debug     | If Yes, outputs URL test information to the log and
+*                         does not clear the JSON libname.
+*                         Default: No
 * Usage: Use this to find the folder URI in Viya. For example, when using
 *        the SAS Viya API to output content to a specific folder.
 *        To confirm that the folder is as expected, use the test URL
 *        output in the log.
 *
 *        
-* Example: %get_folder_uri(/Public);
-*          %get_folder_uri(/Products/SAS Visual Analytics);
-*          %get_folder_uri(@myFolder)
+* Example: %get_folder_uri(/Public); %put URI: &uri;
+*          %get_folder_uri(/Products/SAS Visual Analytics); %put URI: &uri;
+*          %get_folder_uri(@myFolder, debug=yes); %put URI: &uri;
 *
 /******************************************************************************/
+%macro get_folder_uri(path, outmacvar=uri, debug=no);
+    %local  url _uri_ folder_uri wildcard n_folders readfrom name endpoint i t;
+    %global &outmacvar;
 
-%macro get_folder_uri(path);
-    %let url = %sysfunc(getoption(SERVICESBASEURL));
-    %let uri=;
+    %let debug = %upcase(&debug);
+    %let t     = %substr(%sysfunc(datetime()), 1, 7); /* Used for filename/libname randomization */
 
-    %let path = %superq(path);
+    %let url  = %sysfunc(getoption(SERVICESBASEURL));
+    %let path = %qsysfunc(dequote(%superq(path)));
 
     /* Detect wildcard */
     %if(%qsubstr(&path,1,1) = @) %then %let wildcard = 1;
         %else %let wildcard = 0;
 
-    /* If there is no wildcard, calculate the number of folders and
-       read from r.items. Otherwise, set it to 1 and read from r.root since
-       r.items doesn't exist when using a wildcard */
-    %if(NOT &wildcard) %then %do;
-        %let n_folders = %sysfunc(count(&path, /));
-        %let readfrom  = r.items;
-    %end;
-        %else %do;
-            %let n_folders = 1;
-            %let readfrom  = r.root;
-        %end;
+    /* If there is no wildcard, read from r.items. 
+       Otherwise, read from r.root since r.items doesn't 
+       exist when using a wildcard */
+    %let n_folders = %sysfunc(countw(&path, /@));
 
     %do i = 1 %to &n_folders;
-        %let name = %scan(&path, &i, /);
+        %let name = %scan(&path, &i, /@);
 
-        /* Build a folder list as we go along: e.g. /foo/bar/... 
-           Except for wildcards */
-        %if(&i = 1 AND NOT &wildcard) %then %let pathlist = /&name;
-            %else %if(NOT &wildcard) %then %let pathlist = &pathlist/&name;
-                %else %let pathlist = &name;
+        /* If you read from multiple folders or just one folder, 
+           read from items. Otherwise, read from root. */
+        %if(NOT &wildcard OR (&wildcard AND &i > 1))
+            %then %let readfrom = j&t..items;
+        %else %let readfrom  = j&t..root;
+
+        /* Build a folder list as we go along: e.g. 
+          /foo/bar/... 
+          @/foo/bar... */
+           
+        %if(&wildcard AND &i = 1) %then %let pathlist = @&name;
+            %else %if(&i = 1) %then %let pathlist = /&name;
+                %else %let pathlist = &pathlist/&name;
 
     /* 1. First iteration and not a wildcard: Must use rootFolders
        2. If first iteration and a wildcard; Must go directly to the folder (e.g./folders/folders/@myFolder) 
        3. Otherwise, get the members from the URI */
         %if(&i = 1 AND NOT &wildcard) %then %let endpoint = rootFolders; 
-            %else %if(&i = 1 AND &wildcard) %then %let endpoint = folders/&path; 
-                %else %let endpoint = folders/&uri/members;
+            %else %if(&i = 1 AND &wildcard) %then %let endpoint = folders/@&name; 
+                %else %let endpoint = folders/&_uri_/members;
 
-        filename resp temp;
+        %let resp = r&t;
+
+        filename &resp temp;
 
         proc http
             url="&url/folders/&endpoint?filter=eq(name, '&name')"
             method=GET
-            out=resp
+            out=&resp
             oauth_bearer=sas_services;
             headers "Accept"="application/json";
         run;
@@ -89,15 +100,16 @@
             %abort;
         %end;
 
-        libname r json fileref=resp;
+        libname j&t json fileref=&resp;
+        filename &resp clear;
 
         /* Error checking: If the folder does not exist, stop */
         proc sql noprint;
             select *
             from &readfrom
 
-            /* Doesn't work with r.root */
-            %if(NOT &wildcard) %then %do;
+            /* Doesn't work with j.root */
+            %if(NOT &wildcard OR (&wildcard AND &i > 1)) %then %do;
                 where upcase(name) = upcase("&name") 
             %end;
             ;
@@ -112,8 +124,8 @@
         data _null_;
             set &readfrom;
 
-            /* Doesn't work with r.root */
-            %if(NOT &wildcard) %then %do;
+            /* Doesn't work with j.root */
+            %if(NOT &wildcard OR (&wildcard AND &i > 1)) %then %do;
                 where upcase(name) = upcase("&name"); 
             %end;
 
@@ -127,12 +139,20 @@
                 folder_uri = scan(uri, -1, '/');
             %end;
 
-            call symputx('uri', folder_uri);
+            call symputx("_uri_", folder_uri);
         run;
     %end;
 
-    %put **************************************************;
-    %put URI for &pathlist: &uri;
-    %put Test URL: &url/folders/folders/&uri;
-    %put **************************************************;
+    %let &outmacvar = &_uri_;
+
+    %if(&debug = YES) %then %do;
+
+        %put **************************************************;
+        %put URI for &pathlist: &&&outmacvar;
+        %put Test URL: &url/folders/folders/&&&outmacvar;
+        %put **************************************************;
+    %end;
+        %else %do;
+            libname j&t clear;
+        %end;
 %mend;
