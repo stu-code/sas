@@ -1,7 +1,7 @@
 /******************************************************************************\
 * Name: get_folder_uri
 *
-* Purpose: Returns the URI of a folder in Viya in the log or a macro variable
+* Purpose: Returns the URI of a folder in Viya in the log and a macro variable
 *          and optionally gives you a test URL to confirm.
 *
 * Author: Stu Sztukowski
