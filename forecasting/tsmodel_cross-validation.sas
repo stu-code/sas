@@ -21,6 +21,7 @@
 *
 * History: 29MAY2024 Stu | v0.1 - Initial test
 *          30MAY2024 Stu | v0.2 - Significantly improved performance
+*          01MAY2024 Stu | v0.3 - Improved performance further
 \******************************************************************************/
 
 /******* User parameters *******/
@@ -143,7 +144,7 @@ proc tsmodel data   = casuser.a10
 
             /* Prevent lead from going too far (i.e. "collision detection" with the end of time series "wall")
                If this is not done then forecasts will repeat at the end of the series */
-            if(step+lead > _LENGTH_) then lead = lead-1;
+            if(step+lead > _LENGTH_) then leave;
 
             rc = arima_model.setOption('back', lead, 'lead', lead, 'horizon', horizon);
             rc = loglin_model.setOption('back', lead, 'lead', lead, 'horizon', horizon);
