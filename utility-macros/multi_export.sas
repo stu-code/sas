@@ -126,5 +126,3 @@
         run;
     %end;
 %mend;
-%multi_export(sashelp.cars, 5, "C:\Users\stsztu\OneDrive - SAS\Desktop", foo, csv, dlm, 
-    procstmnt=replace, procbodystmnt=%bquote(delimiter='|'));
