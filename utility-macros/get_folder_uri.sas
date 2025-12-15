@@ -1,4 +1,4 @@
-/******************************************************************************\
+﻿/******************************************************************************\
 * Name: get_folder_uri
 *
 * Purpose: Returns the URI of a folder in Viya in the log and a macro variable
@@ -39,8 +39,9 @@
 *          %get_folder_uri(@myFolder, debug=yes); %put URI: &uri;
 *
 /******************************************************************************/
+
 %macro get_folder_uri(path, outmacvar=uri, debug=no);
-    %local  url _uri_ folder_uri wildcard n_folders readfrom name endpoint i t;
+    %local  url _uri_ folder_uri wildcard readfrom name endpoint i t;
     %global &outmacvar;
 
     %let debug = %upcase(&debug);
@@ -56,10 +57,9 @@
     /* If there is no wildcard, read from r.items. 
        Otherwise, read from r.root since r.items doesn't 
        exist when using a wildcard */
-    %let n_folders = %sysfunc(countw(&path, /@));
 
-    %do i = 1 %to &n_folders;
-        %let name = %scan(&path, &i, /@);
+    %do i = 1 %to %sysfunc(countw(&path, /));
+        %let name = %scan(&path, &i, /);
 
         /* If you read from multiple folders or just one folder, 
            read from items. Otherwise, read from root. */
@@ -68,18 +68,19 @@
         %else %let readfrom  = j&t..root;
 
         /* Build a folder list as we go along: e.g. 
+          @wildcard/foo/bar...  
           /foo/bar/... 
-          @/foo/bar... */
+        */
            
-        %if(&wildcard AND &i = 1) %then %let pathlist = @&name;
+        %if(&wildcard AND &i = 1) %then %let pathlist = &name;
             %else %if(&i = 1) %then %let pathlist = /&name;
                 %else %let pathlist = &pathlist/&name;
 
     /* 1. First iteration and not a wildcard: Must use rootFolders
-       2. If first iteration and a wildcard; Must go directly to the folder (e.g./folders/folders/@myFolder) 
+       2. If first iteration and a wildcard: Must go directly to the folder (e.g./folders/folders/@myFolder) 
        3. Otherwise, get the members from the URI */
         %if(&i = 1 AND NOT &wildcard) %then %let endpoint = rootFolders; 
-            %else %if(&i = 1 AND &wildcard) %then %let endpoint = folders/@&name; 
+            %else %if(&i = 1 AND &wildcard) %then %let endpoint = folders/&name; 
                 %else %let endpoint = folders/&_uri_/members;
 
         %let resp = r&t;
