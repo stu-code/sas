@@ -1,0 +1,28 @@
+Jenner 0.1.0 (Unlicensed - limited to 100 observations)
+Get a license at https://jenneranalytics.com/license
+
+NOTE: Option OBS changed to 100.
+NOTE: DATA air_shifted
+
+
+NOTE: Read 100 rows from sashelp.air.
+NOTE: Wrote air_shifted (100 rows, 2 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA air_indexed
+
+
+NOTE: Read 100 rows from sashelp.air.
+NOTE: Wrote air_indexed (100 rows, 3 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC SQL 
+
+NOTE: Table air_lead created.
+NOTE: PROC SQL statement used.
+NOTE: Option TITLE changed to sashelp.air with a 1-step lead column (rows 1-12).
+NOTE: PROC PRINT data=air_lead
+
+NOTE: PROC PRINT completed: 12 observations printed, 3 variables

@@ -1,0 +1,8 @@
+{
+  "bundle": "t005_cquote_macro",
+  "source_file": "utility-macros/cquote.sas",
+  "source_blob_sha": "abe1b54e0c40fa702fecad792fa486e2267db68d",
+  "source_commit": "cf435a5e19eb72e842cda10156dc3ae15072cb98",
+  "tier": "real_code",
+  "notes": "PROC FCMP cquote function exercised in a DATA step against a small list of space-separated strings."
+}

@@ -1,0 +1,64 @@
+Jenner 0.1.0 (Unlicensed - limited to 100 observations)
+Get a license at https://jenneranalytics.com/license
+
+NOTE: Option OBS changed to 100.
+NOTE: DATA class1
+
+
+NOTE: Read 5 rows from sashelp.class.
+NOTE: Wrote class1 (5 rows, 5 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA class2
+
+
+NOTE: Read 5 rows from sashelp.class.
+NOTE: Wrote class2 (5 rows, 5 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA class3
+
+
+NOTE: Read 5 rows from sashelp.class.
+NOTE: Wrote class3 (5 rows, 5 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: DATA class4
+
+
+NOTE: Read 4 rows from sashelp.class.
+NOTE: Wrote class4 (4 rows, 5 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: Option TITLE changed to split_data math applied to sashelp.class (19 rows / N=4).
+NOTE: PROC PRINT data=class1
+
+NOTE: PROC PRINT completed: 5 observations printed, 5 variables
+NOTE: PROC PRINT data=class2
+
+NOTE: PROC PRINT completed: 5 observations printed, 5 variables
+NOTE: PROC PRINT data=class3
+
+NOTE: PROC PRINT completed: 5 observations printed, 5 variables
+NOTE: PROC PRINT data=class4
+
+NOTE: PROC PRINT completed: 4 observations printed, 5 variables
+NOTE: DATA all_pieces
+
+
+NOTE: Read 5 rows from class1.
+NOTE: Read 10 rows from class2.
+NOTE: Read 15 rows from class3.
+NOTE: Read 19 rows from class4.
+NOTE: Wrote all_pieces (19 rows, 5 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: Option TITLE2 changed to Row totals: should be 19 across all splits, no duplicates.
+NOTE: PROC SQL 
+
+NOTE: PROC SQL statement used.

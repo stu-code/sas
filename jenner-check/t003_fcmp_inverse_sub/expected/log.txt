@@ -1,0 +1,18 @@
+Jenner 0.1.0 (Unlicensed - limited to 100 observations)
+Get a license at https://jenneranalytics.com/license
+
+NOTE: Option OBS changed to 100.
+NOTE: PROC FCMP outlib=work.funcs.subs
+
+NOTE: Subroutine inverse stored to work.funcs.subs.
+NOTE: Option CMPLIB changed to WORK.FUNCS.
+NOTE: DATA inverse
+
+
+NOTE: Wrote inverse (4 rows, 1 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC PRINT data=inverse
+
+NOTE: PROC PRINT completed: 4 observations printed, 1 variables

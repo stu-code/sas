@@ -1,0 +1,8 @@
+{
+  "bundle": "t004_powerset_allcomb",
+  "source_file": "powerset/powerset.sas",
+  "source_blob_sha": "416a41f165c6d8cc1a05e5a45c766807ab8c14de",
+  "source_commit": "cf435a5e19eb72e842cda10156dc3ae15072cb98",
+  "tier": "real_code",
+  "notes": "allcomb() with an ARRAY of strings to enumerate every subset of {ant, bee, cat, dog, ewe} - 2^5 = 32 rows."
+}

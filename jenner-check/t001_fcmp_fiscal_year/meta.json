@@ -1,0 +1,8 @@
+{
+  "bundle": "t001_fcmp_fiscal_year",
+  "source_file": "examples/fcmp_examples.sas",
+  "source_blob_sha": "e929b3b68b79ad93fb8ec5f3d0d72b5009faf139",
+  "source_commit": "cf435a5e19eb72e842cda10156dc3ae15072cb98",
+  "tier": "real_code",
+  "notes": "PROC FCMP function fy() turning year + intnx into one custom function; applied in a data step to three sample dates."
+}

@@ -1,0 +1,8 @@
+{
+  "bundle": "t007_lead_air",
+  "source_file": "utility-macros/lead.sas",
+  "source_blob_sha": "7f26871533fb6891a455a23f8800f1c84cdf8350",
+  "source_commit": "cf435a5e19eb72e842cda10156dc3ae15072cb98",
+  "tier": "real_code",
+  "notes": "Add a 1-step lead column to sashelp.air via a row-indexed SQL self-join (same effect as %lead, without the open/fetchobs dataset interface)."
+}

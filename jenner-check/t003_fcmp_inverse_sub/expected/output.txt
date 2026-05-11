@@ -1,0 +1,14 @@
+
+               The FCMP Procedure
+
+  Output Library: work.funcs.subs
+  User-defined Subroutine: inverse
+
+                                   Multiplicative inverse via PROC FCMP CALL routine                                    
+
+  Obs  INV
+    1  0.1
+    2  0.5
+    3    2
+    4
+

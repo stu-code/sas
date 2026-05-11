@@ -1,0 +1,36 @@
+                                  Power set of {ant, bee, cat, dog, ewe} - 32 subsets                                   
+
+  Obs  POWERSET1  POWERSET2  POWERSET3  POWERSET4  POWERSET5
+    1
+    2  ant
+    3  ant
+    4  ant
+    5  ant
+    6  ant
+    7  ant        bee
+    8  ant        bee
+    9  ant        bee
+   10  ant        bee
+   11  ant        bee
+   12  ant        bee
+   13  ant        bee
+   14  ant        bee
+   15  ant        bee
+   16  ant        bee
+   17  ant        bee        cat
+   18  ant        bee        cat
+   19  ant        bee        cat
+   20  ant        bee        cat
+   21  ant        bee        cat
+   22  ant        bee        cat
+   23  ant        bee        cat
+   24  ant        bee        cat
+   25  ant        bee        cat
+   26  ant        bee        cat
+   27  ant        bee        cat        dog
+   28  ant        bee        cat        dog
+   29  ant        bee        cat        dog
+   30  ant        bee        cat        dog
+   31  ant        bee        cat        dog
+   32  ant        bee        cat        dog        ewe
+

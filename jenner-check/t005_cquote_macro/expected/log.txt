@@ -1,0 +1,18 @@
+Jenner 0.1.0 (Unlicensed - limited to 100 observations)
+Get a license at https://jenneranalytics.com/license
+
+NOTE: Option OBS changed to 100.
+NOTE: PROC FCMP outlib=work.funcs.str
+
+NOTE: Function cquote stored to work.funcs.str.
+NOTE: Option CMPLIB changed to WORK.FUNCS.
+NOTE: DATA lists
+
+
+NOTE: Wrote lists (3 rows, 2 columns).
+NOTE: DATA elapsed:
+  wall  0.00 seconds
+  cpu   0.00 seconds
+NOTE: PROC PRINT data=lists
+
+NOTE: PROC PRINT completed: 3 observations printed, 2 variables

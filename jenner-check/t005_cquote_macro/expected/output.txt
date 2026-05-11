@@ -1,0 +1,13 @@
+
+               The FCMP Procedure
+
+  Output Library: work.funcs.str
+  User-defined Function: cquote
+
+                            Space-separated -> double-quoted, comma-separated (FCMP cquote)                             
+
+  Obs             RAW                    DQ
+    1  BMW Audi Volvo  "BMW","Audi","Volvo"
+    2  cars class air  "cars","class","air"
+    3  a b c           "a","b","c"
+

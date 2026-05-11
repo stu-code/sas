@@ -1,0 +1,21 @@
+{
+  "_captured_at": "2026-05-11T09:30:00Z",
+  "_captured_run_id": "r_019e165ddba67d9191a74ffc65e8b51d",
+  "status": "ok",
+  "exit_code": 0,
+  "log_contains": [
+    "NOTE: Wrote air_shifted (100 rows, 2 columns).",
+    "NOTE: Wrote air_indexed (100 rows, 3 columns).",
+    "NOTE: Table air_lead created.",
+    "NOTE: PROC SQL statement used.",
+    "NOTE: PROC PRINT completed: 12 observations printed, 3 variables"
+  ],
+  "log_does_not_contain": [
+    "ERROR:",
+    "[JENNER-ERROR"
+  ],
+  "diagnostics": {
+    "parse_warnings": [],
+    "runtime_warnings": []
+  }
+}

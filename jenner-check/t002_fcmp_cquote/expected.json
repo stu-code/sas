@@ -1,0 +1,20 @@
+{
+  "_captured_at": "2026-05-11T09:30:00Z",
+  "_captured_run_id": "r_019e165dc0707ff282726fb89a6a80ee",
+  "status": "ok",
+  "exit_code": 0,
+  "log_contains": [
+    "NOTE: PROC FCMP outlib=work.funcs.string",
+    "NOTE: Function cquote stored to work.funcs.string.",
+    "NOTE: Wrote demo (2 rows, 2 columns).",
+    "NOTE: PROC PRINT completed: 2 observations printed, 2 variables"
+  ],
+  "log_does_not_contain": [
+    "ERROR:",
+    "[JENNER-ERROR"
+  ],
+  "diagnostics": {
+    "parse_warnings": [],
+    "runtime_warnings": []
+  }
+}

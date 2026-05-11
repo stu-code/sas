@@ -1,0 +1,8 @@
+{
+  "bundle": "t006_split_data",
+  "source_file": "utility-macros/split_data.sas",
+  "source_blob_sha": "112f7d1d74235464d403b5b6ca69653c93de5d80",
+  "source_commit": "cf435a5e19eb72e842cda10156dc3ae15072cb98",
+  "tier": "real_code",
+  "notes": "Apply the split_data math (firstobs/obs offsets for N pieces) to sashelp.class; concatenate to confirm the pieces cover the original 19 rows."
+}

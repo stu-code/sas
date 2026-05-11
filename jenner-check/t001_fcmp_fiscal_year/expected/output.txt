@@ -1,0 +1,13 @@
+
+               The FCMP Procedure
+
+  Output Library: work.funcs.time
+  User-defined Function: fy
+
+                                       Fiscal year (July start) for sample dates                                        
+
+  Obs       DATE  FISCAL_YEAR
+    1  01JUL2020         2020
+    2  30JUN2020         2020
+    3  15JAN2021         2021
+

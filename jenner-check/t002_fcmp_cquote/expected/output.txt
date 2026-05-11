@@ -1,0 +1,12 @@
+
+               The FCMP Procedure
+
+  Output Library: work.funcs.string
+  User-defined Function: cquote
+
+                             Space-separated lists turned into IN()-compatible quoted lists                             
+
+  Obs         INPUT_LIST              QUOTED_LIST
+    1  cars class air     "cars","class","air"
+    2  BMW Mercedes Audi  "BMW","Mercedes","Audi"
+

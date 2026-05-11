@@ -1,0 +1,20 @@
+{
+  "_captured_at": "2026-05-11T09:30:00Z",
+  "_captured_run_id": "r_019e165dc5ef7d92bbd2642637fa5b0f",
+  "status": "ok",
+  "exit_code": 0,
+  "log_contains": [
+    "NOTE: PROC FCMP outlib=work.funcs.subs",
+    "NOTE: Subroutine inverse stored to work.funcs.subs.",
+    "NOTE: Wrote inverse (4 rows, 1 columns).",
+    "NOTE: PROC PRINT completed: 4 observations printed, 1 variables"
+  ],
+  "log_does_not_contain": [
+    "ERROR:",
+    "[JENNER-ERROR"
+  ],
+  "diagnostics": {
+    "parse_warnings": [],
+    "runtime_warnings": []
+  }
+}
