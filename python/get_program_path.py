@@ -14,6 +14,7 @@ def get_program_path() -> str:
     Returns:
         str: The parent directory path as a string, or None if unavailable.
     """
+    
     try:
         if SAS.symget('_SASPROGRAMFILE') != None:
             full_path = SAS.symget('_SASPROGRAMFILE')
@@ -23,7 +24,6 @@ def get_program_path() -> str:
             job_uri  = SAS.symget('SYS_JES_JOB_URI')    # Name of the running job
             token    = os.getenv('SAS_SERVICES_TOKEN')  # Oauth token
 
-            # Set up the headers for authentication and content-type
             headers = {
                 "Authorization": f"Bearer {token}",
                 "Accept": "application/json"
@@ -31,17 +31,17 @@ def get_program_path() -> str:
 
             request_url = f"{viya_url}/{job_uri}"
 
-            # Send the GET request to the SAS Viya endpoint
+            # Send the GET request to the Viya endpoint
             resp = requests.get(request_url, headers=headers)
             resp.raise_for_status()
             resp_json = resp.json()
 
-            # Extract the path from the JSON response
+            # Extract the path
             full_path = resp_json['jobRequest']['jobDefinition']['properties'][0]['value']
             
         parent_path = Path(full_path).parent
 
-        return str(parent_path)  # Return as string
+        return str(parent_path)
 
     except Exception as e:
         print(f"Error retrieving file path: {e}")
