@@ -23,7 +23,7 @@ A simple POC reference program that converts a SAS Notebook (`.sasnb`) to a stan
 Edit `SASNB` and `IPYNB` at the top of the script to choose different input/output files, then run:
 
 ```bash
-py convert_sasnb.py
+py sasnb2ipynb.py
 ```
 
 ## Limitations
